@@ -28,7 +28,7 @@ func main() {
 		fmt.Println("Good evening")
 	}
 
-	checkType := func(i interface{}) {
+	checkType := func(i any) {
 		switch v := i.(type) {
 		case int:
 			fmt.Printf("Integer: %d\n", v)
