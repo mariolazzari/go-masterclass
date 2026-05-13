@@ -399,3 +399,57 @@ func main() {
 	fmt.Printf("Subtotal Price: %.2f\n", subtotal)
 }
 ```
+
+## Complex data types
+
+### Array
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var numbers [2]int
+	fmt.Printf("Numbers: %+v\n", numbers)
+
+	numbers[0] = 1
+	numbers[1] = 2
+	fmt.Printf("Numbers: %+v\n", numbers)
+
+	primes := [5]int{2, 3, 5, 7, 11}
+	fmt.Printf("Primes: %+v\n", primes)
+
+	var matrix [2][3]int
+	matrix[0][0] = 1
+	matrix[0][1] = 2
+	matrix[1][2] = 3
+	fmt.Printf("Matrix: %+v\n", matrix)
+}
+```
+
+### Slices
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	names := []string{"Mario", "Mariarosa", "Maria"}
+	fmt.Printf("Names: %+v\n", names)
+
+	items := make([]int, 3, 5)
+	fmt.Printf("Items: %+v, Len: %d, Cap: %d\n", items, len(items), cap(items))
+
+	items = append(items, 1)
+	items = append(items, 2)
+	items = append(items, 3)
+	fmt.Printf("Items: %+v, Len: %d, Cap: %d\n", items, len(items), cap(items))
+
+	fmt.Println("items[1:5]", items[1:5])
+	fmt.Println("items[:5]", items[:5])
+	fmt.Println("items[5:]", items[5:])
+	fmt.Println("items[5:]", items[:])
+}
+```
