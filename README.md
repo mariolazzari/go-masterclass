@@ -447,9 +447,184 @@ func main() {
 	items = append(items, 3)
 	fmt.Printf("Items: %+v, Len: %d, Cap: %d\n", items, len(items), cap(items))
 
-	fmt.Println("items[1:5]", items[1:5])
-	fmt.Println("items[:5]", items[:5])
-	fmt.Println("items[5:]", items[5:])
-	fmt.Println("items[5:]", items[:])
+		fmt.Println("Advance slice")
+		slice := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+		fmt.Printf("slice: %+v, Len: %d, Cap: %d\n", slice, len(slice), cap(slice))
+
+		s1 := slice[2:5]
+		fmt.Printf("s1: %+v, Len: %d, Cap: %d\n", s1, len(s1), cap(s1))
+
+		s2 := slice[:4]
+		fmt.Printf("s2: %+v, Len: %d, Cap: %d\n", s2, len(s2), cap(s2))
+
+		s3 := slice[6:]
+		fmt.Printf("s3: %+v, Len: %d, Cap: %d\n", s3, len(s3), cap(s3))
+
+		s4 := slice[:]
+		fmt.Printf("s4: %+v, Len: %d, Cap: %d\n", s4, len(s4), cap(s4))
+
+		ok := slices.Contains(slice, 4)
+		if ok {
+			fmt.Println("4 is present")
+		}
+
+		s4 = append(s4, 1000)
+		fmt.Printf("s4: %+v, Len: %d, Cap: %d\n", s4, len(s4), cap(s4))
 }
+```
+
+### Maps
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	studentGrades := map[string]int{
+		"Mario":     30,
+		"Mariarosa": 30,
+		"Gino":      18,
+	}
+	fmt.Printf("Grades: %+v\n", studentGrades)
+
+	studentGrades["Gino"] = 20
+	fmt.Printf("Grades: %+v\n", studentGrades)
+
+	mario, ok := studentGrades["Mario"]
+	if ok {
+		fmt.Printf("Mario: %d\n", mario)
+	}
+
+	_, ok = studentGrades["Pino"]
+	if ok {
+		fmt.Println("Pino was here")
+	}
+
+	delete(studentGrades, "Gino")
+	fmt.Printf("Grades: %+v\n", studentGrades)
+
+	configs := make(map[string]int)
+	fmt.Printf("%+v, %T\n", configs, configs)
+
+	if configs == nil {
+		fmt.Println("configs is nil")
+	}
+
+	for k, v := range studentGrades {
+		fmt.Println(k, v)
+	}
+}
+```
+
+### Pointers
+
+```go
+package main
+
+import "fmt"
+
+func modifyValue(val *int) {
+	if val == nil {
+		fmt.Println("val is nil")
+		return
+	}
+
+	*val *= 10
+	fmt.Println("modifyValue:", *val)
+}
+
+func main() {
+	age := 51
+	ptrAge := &age
+
+	fmt.Println("age    :", age)
+	fmt.Println("ptrAge :", ptrAge)
+	fmt.Println("*ptrAge:", *ptrAge)
+
+	modifyValue(&age)
+	fmt.Println("main", age)
+	modifyValue(nil)
+}
+```
+
+### Project: CMS
+
+```go
+package main
+
+import "fmt"
+
+type Contact struct {
+	ID    int
+	Name  string
+	Email string
+	Phone string
+}
+
+var contactList []Contact
+var contactIndexByName map[string]int
+var nextID int = 1
+
+func init() {
+	contactList = make([]Contact, 0)
+	contactIndexByName = make(map[string]int)
+}
+
+func addContact(name, email, phone string) {
+	if _, exists := contactIndexByName[name]; exists {
+		fmt.Printf("Contact %s exists\n", name)
+		return
+	}
+
+	contactList = append(contactList, Contact{
+		ID:    nextID,
+		Name:  name,
+		Email: email,
+		Phone: phone,
+	})
+	contactIndexByName[name] = nextID
+
+	fmt.Printf("Contact %s added\n", name)
+	nextID++
+}
+
+func findContact(name string) *Contact {
+	if idx, ok := contactIndexByName[name]; ok {
+		return &contactList[idx]
+	}
+	return nil
+}
+
+func listContacts() {
+	if len(contactList) == 0 {
+		fmt.Println("No contact found")
+	}
+
+	for _, c := range contactList {
+		fmt.Println(c)
+	}
+}
+
+func main() {
+	listContacts()
+	addContact("Mario", "mario@lazzari.it", "123-1234")
+	addContact("Maria", "maria@lazzari.it", "123-4321")
+	listContacts()
+
+	mario := findContact("Mario")
+	if mario == nil {
+		fmt.Println("Mario not found")
+	} else {
+		fmt.Println("Found:", *mario)
+	}
+}
+```
+
+## Functions & errors
+
+### Functions
+
+```go
+
 ```
