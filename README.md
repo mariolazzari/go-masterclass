@@ -658,3 +658,83 @@ func main() {
 
 }
 ```
+
+### More on functions
+
+```go
+package main
+
+import "fmt"
+
+func factorial(n int) int {
+	if n < 2 {
+		return 1
+	}
+	return n * factorial(n-1)
+}
+
+func intSeq() func() int {
+	i := 0
+
+	return func() int {
+		i++
+		return i
+	}
+}
+
+func main() {
+	f := factorial(5)
+	fmt.Println(f)
+
+	next := intSeq()
+	fmt.Println(next())
+	fmt.Println(next())
+	fmt.Println(next())
+
+	logger := func(msg string) {
+		fmt.Println(msg)
+	}
+
+	logger("Mario")
+}
+```
+
+### Variadic functions
+
+```go
+package main
+
+import "fmt"
+
+func add(nums ...int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+
+	var sum int = 0
+	for _, n := range nums {
+		sum += n
+	}
+
+	return sum
+}
+
+func configs(nums ...int) {
+	if len(nums) > 0 {
+		fmt.Println(nums[0])
+	} else {
+		fmt.Println("Default")
+	}
+
+}
+
+func main() {
+	fmt.Println(add())
+	fmt.Println(add(1))
+	fmt.Println(add(1, 2))
+	fmt.Println(add(1, 2, 3))
+
+	configs()
+	configs(1, 2, 3)
+}
+```
