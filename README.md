@@ -1310,3 +1310,11 @@ func main() {
 	ProcessPayroll(payrollList)
 }
 ```
+
+## Composition design pattern
+
+### Composition
+
+```go
+
+```
