@@ -861,5 +861,133 @@ func main() {
 ### Defer
 
 ```go
+package main
 
+import (
+	"fmt"
+	"os"
+)
+
+func simpleDefer() {
+	fmt.Println("Start simpleDefer")
+	defer fmt.Println("1st Defer simpleDefer")
+	defer fmt.Println("2nd Defer simpleDefer")
+	fmt.Println("Middle simpleDefer")
+}
+
+func main() {
+	defer func() {
+		fmt.Println("Before main returns")
+	}()
+	simpleDefer()
+
+	file, err := os.Open("main.go")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+
+	fmt.Println("Main last")
+}
 ```
+
+### Panic
+
+```go
+package main
+
+import "fmt"
+
+func mayPanic(isPanic bool) {
+	if isPanic {
+		panic("panic!")
+	}
+	fmt.Println("Done")
+}
+
+func recoverable() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recover from panic")
+		}
+	}()
+
+	mayPanic(true)
+}
+
+func main() {
+	mayPanic(false)
+	recoverable()
+}
+```
+
+### Project math
+
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+const (
+	division  = "Division"
+	divByZero = "Division by 0"
+)
+
+type MathError struct {
+	Operation string
+	InputA    int
+	InputB    int
+	Message   string
+}
+
+func (e MathError) Error() string {
+	var inputs []string
+
+	if e.Operation == "Division" {
+		inputs = append(inputs, fmt.Sprintf("a=%d", e.InputA))
+		inputs = append(inputs, fmt.Sprintf("b=%d", e.InputB))
+	}
+
+	return fmt.Sprintf("Math error in %s (%s): %s", e.Operation, strings.Join(inputs, ","), e.Message)
+}
+
+func sum(nums ...int) int {
+	defer fmt.Println("Sum finished")
+
+	total := 0
+	for _, n := range nums {
+		total += n
+	}
+	return total
+}
+
+func safeDiv(a, b int) (int, error) {
+	if b == 0 {
+		return 0, MathError{
+			Operation: division,
+			InputA:    a,
+			InputB:    b,
+			Message:   divByZero,
+		}
+	}
+
+	return a / b, nil
+}
+
+func main() {
+	fmt.Printf("sum: %d\n", sum(1, 2, 3, 4))
+	res, err := safeDiv(1, 0)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(res)
+	}
+}
+```
+
+## OOP in Go
+
+### Custom types
