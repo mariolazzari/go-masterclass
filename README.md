@@ -1699,5 +1699,277 @@ func main() {
 ### Unicode
 
 ```go
+package main
+
+import (
+	"fmt"
+	"unicode"
+)
+
+func main() {
+	mario := "mario"
+	marioJap := "マリオ"
+
+	fmt.Println(len(mario))
+	fmt.Println(len(marioJap))
+
+	fmt.Printf("%c\n", mario[0])
+	fmt.Printf("%c\n", mario[0])
+
+	for _, c := range mario {
+		fmt.Println(c)
+	}
+	for _, c := range mario {
+		fmt.Println(string(c))
+	}
+
+	for _, c := range marioJap {
+		fmt.Println(c)
+	}
+	for _, c := range marioJap {
+		fmt.Println(string(c))
+	}
+
+	// rune
+	fmt.Println("rune")
+	data := []rune{'マ', 'リ', 'オ'}
+	for _, d := range data {
+		fmt.Println(string(d), unicode.IsLower(d), unicode.IsLetter(d))
+	}
+
+}
+```
+
+### Regex
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"regexp"
+)
+
+func main() {
+	text1 := "Hello, World! Welcome to Go!"
+
+	regGo, err := regexp.Compile(`Go`)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Text '%s' matches 'Go': %t\n", text1, regGo.MatchString(text1))
+
+	text2 := "Product codes: P123, X123, P789"
+
+	regProd := regexp.MustCompile(`P\d+`)
+
+	firstProd := regProd.FindString(text2)
+	fmt.Println(string(firstProd))
+
+	allProds := regProd.FindAllString(text2, -1)
+	fmt.Println(allProds)
+}
+```
+
+### Templates
+
+```go
+package main
+
+import (
+	"fmt"
+	"html/template"
+	"os"
+	"strings"
+)
+
+type EmailData struct {
+	RecipientName string
+	SenderName    string
+	Subject       string
+	Body          string
+	Items         []string // demo a loop
+	UnreadCount   int
+}
+
+func main() {
+
+	fmt.Println("--- Text template example ---")
+
+	emailTemplate := `
+Subject: {{ .Subject }}
+
+{{.Body}}
+
+{{if .Items}}
+   Related Items:
+{{range .Items}}
+	- {{.}}
+{{end}}
+{{end}}
+
+{{if gt .UnreadCount 0}}
+You have {{.UnreadCount}} unreads.
+{{else}}
+You have no messages
+{{end}}
+
+
+- Thanks
+{{.SenderName}}
+`
+	tmpl, err := template.New("email-message").Parse(emailTemplate)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	data := EmailData{
+		RecipientName: "Alice",
+		SenderName:    "Bob's Auto-Responder",
+		Subject:       "Your Weekly Update",
+		Body:          "Here is the update you requested. We hope you find it useful.",
+		Items:         []string{"Report A", "Document B", "Summary C"},
+		UnreadCount:   0,
+	}
+
+	var output strings.Builder
+
+	err = tmpl.Execute(&output, data)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	fmt.Println(strings.ToUpper(output.String()))
+}
+```
+
+### Project: config parser
+
+```go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"regexp"
+	"strings"
+)
+
+func parseConfig(content string) (map[string]string, error) {
+	config := make(map[string]string)
+
+	re := regexp.MustCompile(`^\s*([\w.-]+)\s*=\s*(?:'([^']*)'|"([^"]*)"|([^#\s]*))?(?:\s*#.*)?$`)
+
+	scanner := bufio.NewScanner(strings.NewReader(content))
+	lineNo := 0
+
+	for scanner.Scan() {
+		lineNo++
+		line := scanner.Text()
+
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine == "" || strings.HasPrefix(trimmedLine, "#") {
+			continue
+		}
+
+		matches := re.FindStringSubmatch(trimmedLine)
+		if matches == nil {
+			fmt.Printf("Line %d: '%s' - Is Inavlid\n", lineNo, line)
+			continue
+		}
+		key := matches[1]
+		var value string
+
+		if matches[2] != "" {
+			value = matches[2]
+		} else if matches[3] != "" {
+			value = matches[3]
+		} else {
+			value = matches[4]
+		}
+
+		config[key] = value
+	}
+
+	return config, nil
+}
+
+func main() {
+
+	envFileContent := `
+# Application Configuration
+APP_NAME="My Cool App"
+APP_VERSION="1.0.2-beta" # Version with quotes
+PORT=8080
+DEBUG_MODE="true"
+# Database Settings
+DB_HOST=localhost
+DB_USER = admin
+DB_PASSWORD = "p@s$w Ord With Sp@ces!" # Quoted password
+API_ENDPOINT = https://api.example.com/v1
+
+# An empty value
+EMPTY_KEY=
+ANOTHER_KEY_NO_VALUE =`
+
+	config, err := parseConfig(envFileContent)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	for k, v := range config {
+		fmt.Printf("%s=%q\n", k, v)
+	}
+
+}
+```
+
+## Modules
+
+### Go module
+
+```sh
+go mod init github.com/mariolazzari/my-module
+```
+
+## Concurrency
+
+### Starting go routine
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func sayHello(msg string, delay time.Duration) {
+	time.Sleep(delay)
+	fmt.Println("sayHello", msg)
+}
+
+func main() {
+	fmt.Println("Main start")
+
+	go sayHello("Ciao 1s", time.Second)
+	go sayHello("Ciao 2s", 2*time.Second)
+	go sayHello("Ciao 3s", 3*time.Second)
+
+	fmt.Println("Main end")
+	time.Sleep(2 * time.Second)
+}
+```
+
+### Wait groups
+
+```go
 
 ```
