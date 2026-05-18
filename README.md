@@ -2340,3 +2340,80 @@ func main() {
 	log.Println("Done")
 }
 ```
+
+### Mutex
+
+```sh
+go run --race 11-concurrency/58-mutex/main.go
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+type BankAccount struct {
+	balance int
+	mtx     sync.Mutex
+}
+
+func (b *BankAccount) Deposit(val int) {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+	b.balance += val
+}
+
+func (b *BankAccount) WithDraw(val int) {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+	b.balance -= val
+}
+
+func (ba *BankAccount) Balance() int {
+	ba.mtx.Lock()
+	defer ba.mtx.Unlock()
+
+	return ba.balance
+}
+
+func main() {
+	counter := 0
+	var wg sync.WaitGroup
+	var mtx sync.Mutex
+
+	for range 10 {
+		wg.Go(func() {
+			mtx.Lock()
+			counter++
+			mtx.Unlock()
+		})
+	}
+
+	wg.Wait()
+	fmt.Println(counter)
+
+	var wgBank sync.WaitGroup
+	ba := BankAccount{
+		balance: 10,
+	}
+
+	for i := range 10 {
+		wgBank.Add(1)
+
+		go func(val int) {
+			defer wgBank.Done()
+			if val%2 == 1 {
+				ba.Deposit(val)
+			} else {
+				ba.WithDraw(val)
+			}
+		}(i)
+	}
+
+	wgBank.Wait()
+	fmt.Println(ba.Balance())
+}
+```
