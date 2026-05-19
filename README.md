@@ -2395,16 +2395,15 @@ func main() {
 	wg.Wait()
 	fmt.Println(counter)
 
-	var wgBank sync.WaitGroup
 	ba := BankAccount{
 		balance: 10,
 	}
 
 	for i := range 10 {
-		wgBank.Add(1)
+		wg.Add(1)
 
 		go func(val int) {
-			defer wgBank.Done()
+			defer wg.Done()
 			if val%2 == 1 {
 				ba.Deposit(val)
 			} else {
@@ -2413,114 +2412,45 @@ func main() {
 		}(i)
 	}
 
-	wgBank.Wait()
+	wg.Wait()
 	fmt.Println(ba.Balance())
 }
 ```
 
-## Files and directories
-
-### Files
+### Directories
 
 ```go
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"io"
 	"log"
 	"os"
-)
-
-func main() {
-	filePath := "./10section/1-files/text.txt"
-	data := "Welcome to the Go programming languages! Lots of love for Go"
-	err := os.WriteFile(filePath, []byte(data), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Done writing")
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(string(content))
-
-	/*file2, err := os.Create("file-via-create.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file2.Close()
-
-	_, err = file2.WriteString("Welcome all Java and Python and Javascript and PHP and Ruby developers")
-	if err != nil {
-		log.Fatal(err)
-	}*/
-
-	fileName := "file-via-create.txt"
-
-	printContent(fileName)
-
-	newFile, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer newFile.Close()
-
-	_, _ = newFile.WriteString(fmt.Sprintf("- C\n"))
-	_, _ = newFile.WriteString(fmt.Sprintf("- Ruby\n"))
-	_, _ = newFile.WriteString(fmt.Sprintf("- Fortan\n"))
-	_, _ = newFile.WriteString(fmt.Sprintf("- Ada\n"))
-	_, _ = newFile.WriteString(fmt.Sprintf("- Rust\n"))
-}
-
-func printContent(fileName string) {
-	newFile, err := os.Open(fileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer newFile.Close()
-
-	scanner := bufio.NewScanner(newFile)
-	lineNum := 1
-	for scanner.Scan() {
-		fmt.Println(lineNum, scanner.Text())
-		lineNum++
-	}
-
-	if err := scanner.Err(); err != nil {
-		if err != io.EOF {
-			log.Fatal(err)
-		}
-	}
-}
-```
-
-### File paths
-
-```go
-package main
-
-import (
-	"fmt"
 	"path/filepath"
 )
 
 func main() {
+	dir := "download"
 
-	path1 := filepath.Join("C:", "Users", "Documents")
-	fmt.Println(path1)
+	// mkdir
+	if err := os.Mkdir(dir, 0755); err != nil {
+		log.Fatal(err)
+	}
+	// del
+	if err := os.Remove(dir); err != nil {
+		log.Fatal(err)
+	}
 
-	path2 := filepath.Join("config", "app.yaml")
-	fmt.Println(path2)
+	dir = "download/static/images"
 
-	fmt.Println(filepath.Base(path2))
-	fmt.Println(filepath.Ext(path2))
+	// mkdir -p
+	if err := os.MkdirAll(filepath.Clean(dir), 0755); err != nil {
+		log.Fatal(err)
+	}
 
-	dirtyDir := "./users/./dir/../other_dir/./file.txt"
-	fmt.Println(filepath.Clean(dirtyDir))
+	// del
+	dir = "download"
+	if err := os.RemoveAll(filepath.Clean(dir)); err != nil {
+		log.Fatal(err)
+	}
 }
 ```
