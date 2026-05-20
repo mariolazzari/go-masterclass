@@ -2739,3 +2739,15 @@ func main() {
 	fmt.Println(string(decodedStr))
 }
 ```
+
+## Database
+
+### Table creation
+
+```sh
+go get github.com/mattn/go-sqlite3
+```
+
+```go
+
+```
