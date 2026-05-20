@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 `
 
+var db *sql.DB
+
 func main() {
 	dbName := "data.db"
 	_ = os.Remove(dbName)
