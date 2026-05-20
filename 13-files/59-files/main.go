@@ -45,11 +45,11 @@ func main() {
 	}
 	defer newFile.Close()
 
-	_, _ = newFile.WriteString(fmt.Sprintf("- C\n"))
-	_, _ = newFile.WriteString(fmt.Sprintf("- Ruby\n"))
-	_, _ = newFile.WriteString(fmt.Sprintf("- Fortan\n"))
-	_, _ = newFile.WriteString(fmt.Sprintf("- Ada\n"))
-	_, _ = newFile.WriteString(fmt.Sprintf("- Rust\n"))
+	_, _ = fmt.Fprintf(newFile, "- C\n")
+	_, _ = fmt.Fprintf(newFile, "- Ruby\n")
+	_, _ = fmt.Fprintf(newFile, "- Fortan\n")
+	_, _ = fmt.Fprintf(newFile, "- Ada\n")
+	_, _ = fmt.Fprintf(newFile, "- Rust\n")
 }
 
 func printContent(fileName string) {

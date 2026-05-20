@@ -2522,3 +2522,123 @@ func main() {
 
 }
 ```
+
+## Encoding data
+
+### Marshaling
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"encoding/xml"
+	"fmt"
+	"log"
+)
+
+type user struct {
+	Name     string `json:"name" xml:"name"`
+	Age      int    `json:"age" xml:"age"`
+	Phone    string `json:"phone" xml:"phone"`
+	IsActvie bool   `json:"is_active" xml:"is_active"`
+}
+
+func main() {
+	mario := user{
+		Name:     "Mario",
+		Age:      51,
+		Phone:    "123-1234",
+		IsActvie: true,
+	}
+
+	// JSON
+	byteSlice, err := json.Marshal(mario)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(byteSlice))
+
+	// JSON with identation
+	byteSlice, err = json.MarshalIndent(mario, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(byteSlice))
+
+	// XML
+	byteSlice, err = xml.Marshal(mario)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(byteSlice))
+
+}
+```
+
+### Unmarshaling
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+)
+
+type user struct {
+	Name     string  `json:"name" xml:"name"`
+	Age      int     `json:"age" xml:"age"`
+	Phone    string  `json:"phone" xml:"phone"`
+	Password string  `json:"-" xml:"-"`
+	IsActvie bool    `json:"is_active" xml:"is_active"`
+	Profile  profile `json:"profile" xml:"profile"`
+}
+
+type profile struct {
+	URL string `json:"url" xml:"url"`
+}
+
+var payload = `{
+  "name": "Mario",
+  "age": 51,
+  "phone": "123-1234",
+  "password": "s3cret",
+  "is_active": true,
+  "profile": {
+  	"url": "mariolazzari.it"
+  }
+}`
+
+func main() {
+	var mario user
+	err := json.Unmarshal([]byte(payload), &mario)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Mario: %+v\n", mario)
+
+	m, err := json.MarshalIndent(mario, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("m: %s\n", m)
+
+}
+```
+
+### Encoder
+
+```go
+```
+
+### Decoder
+
+```go
+```
+
+### Encoding & decoding
+
+```go
+```
