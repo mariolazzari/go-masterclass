@@ -2631,14 +2631,111 @@ func main() {
 ### Encoder
 
 ```go
+package main
+
+import (
+	"encoding/json"
+	"log"
+	"os"
+)
+
+type user struct {
+	Name     string `json:"name" xml:"name"`
+	Age      int    `json:"age" xml:"age"`
+	Phone    string `json:"phone" xml:"phone"`
+	Password string `json:"-" xml:"-"`
+	IsActvie bool   `json:"is_active" xml:"is_active"`
+}
+
+func main() {
+	mario := user{
+		Name:     "Mario",
+		Age:      51,
+		Phone:    "123-1234",
+		IsActvie: true,
+	}
+
+	enc := json.NewEncoder(os.Stdout)
+	if err := enc.Encode(&mario); err != nil {
+		log.Fatal(err)
+	}
+}
 ```
 
 ### Decoder
 
 ```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"strings"
+)
+
+type user struct {
+	Name     string `json:"name" xml:"name"`
+	Age      int    `json:"age" xml:"age"`
+	Phone    string `json:"phone" xml:"phone"`
+	Password string `json:"-" xml:"-"`
+	IsActvie bool   `json:"is_active" xml:"is_active"`
+}
+
+var payload = `{
+  "name": "Mario",
+  "age": 51,
+  "phone": "123-1234",
+  "password": "s3cret",
+  "is_active": true,
+  "profile": {
+  	"url": "mariolazzari.it"
+  }
+}`
+
+func main() {
+	var u user
+	enc := json.NewDecoder(strings.NewReader(payload))
+	if err := enc.Decode(&u); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(u)
+
+}
 ```
 
-### Encoding & decoding
+### Base 64 encoding & decoding
 
 ```go
+package main
+
+import (
+	"encoding/base64"
+	"fmt"
+	"log"
+)
+
+func main() {
+	data := "Welcome to Go!"
+	encoded := base64.StdEncoding.EncodeToString([]byte(data))
+	fmt.Println(encoded)
+
+	endodedStr := "V2VsY29tZSB0byBHbyE="
+	decodedStr, err := base64.StdEncoding.DecodeString(endodedStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(decodedStr))
+
+	rawData := []byte{0xAA, 0xDE}
+	rawStr := base64.StdEncoding.EncodeToString(rawData)
+	fmt.Println(rawStr)
+
+	b64str := "qt4="
+	decodedStr, err = base64.StdEncoding.DecodeString(b64str)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(decodedStr))
+}
 ```
